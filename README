@@ -1,0 +1,15 @@
+README for the containerized graph viewer app v 0.1 
+
+Docker launches a server that you can access at localhose:8050 
+
+The command to do this (w/ an appropriate docker image - docker build _appname_ ) 
+
+docker run -p 8050:8050 -v "$(pwd)"/app:/app --rm 3d_container
+
+(Here, the options are important, especially -p and -v)
+
+To build the image, make sure Docker is installed and run 
+
+`docker build -t 3d_container .`
+
+(Here, the . for the working directory is important)
