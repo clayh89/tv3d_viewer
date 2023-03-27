@@ -7,7 +7,9 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 
-df = pd.read_csv('plot.ly5.csv').T
+### df = DataFrame (Pandas)
+# this setups up the data, the 4 luminance points
+df = pd.read_csv('plot.ly5.csv').T 
 df.columns = [3, 12, 35, 100]
 df = df.reset_index()
 
@@ -27,14 +29,20 @@ brand_rename = {'lg': 'LG', 'so': 'Sony', 'sa': 'Samsung', 'vi': 'Vizio'}
 fdf = fdf.reset_index()
 fdf['brand'] = fdf['tv'].apply(lambda x: brand_rename[x[:2].lower()])
 
+# this creates the frontend 
+
 app = dash.Dash()
 app.config.suppress_callback_exceptions = True
 server = app.server
 
 app.layout = html.Div([
+    dcc.Dropdown(['p1', 'p2', 'p3'], 'p1', id='plane-select'), #added 
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
 ])
+
+#commented out, but not sure why yet
+
 # app.layout = html.Div(children=[
 #
 #     html.B('Grey Surface Equation   '),
@@ -73,6 +81,14 @@ app.layout = html.Div([
 #     html.Div(id='abc-off-plot'),
 # ])
 
+
+
+############################################
+# page_x_layout generates static plain equations 
+# right now, route swaps between the two
+# we can build interface for that
+#
+
 page_1_layout = html.Div(children=[
     html.B('Grey Surface Equation   '),
     dcc.Input(
@@ -108,6 +124,15 @@ page_2_layout = html.Div(children=[
     ),
     html.Div(id='abc-off-plot'),
 ])
+
+@app.callback(
+    Output('dd-output-container', 'children'),
+    Input('demo-dropdown', 'value')
+)
+def update_output(value):
+    return
+
+
 
 
 @app.callback(
