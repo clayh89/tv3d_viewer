@@ -145,7 +145,7 @@ def abc_on_plot(eq1, eq2):
         tv_df = fdf[fdf['tv'] == tv].sort_values(by='lux')
         brand = tv_df['brand'].iloc[0]
         color = color_dict[brand]
-        marker = {'color': color, 'size': 4}
+        marker = {'color': color, 'size': 8}
         text = tv_df['lux'].astype(str).to_list()
         hovertemplate = 'lux: %{text}<br>' + 'sq inches: %{x:.0f}' + '<br>nits: %{y:.0f}' + '<br>watts:  %{z:.0f}'
         scatter = go.Scatter3d(x=tv_df['area'], y=tv_df['luminance'], z=tv_df['power'],
@@ -201,7 +201,7 @@ def abc_off_plot(eq1, eq2):
     for brand in df['brand'].unique():
         brand_df = df[df['brand']==brand]
         color = color_dict[brand_df['brand'].iloc[0]]
-        marker = {'color': color, 'size': 4}
+        marker = {'color': color, 'size': 8}
         text = brand_df['tv'].to_list()
         hovertemplate = '%{text}<br>' + 'sq. in.: %{x:.0f}' + '<br>nits: %{y:.0f}' + '<br>watts:  %{z:.0f}'
         scatter = go.Scatter3d(x=brand_df['area'], y=brand_df['luminance'], z=brand_df['power'],
