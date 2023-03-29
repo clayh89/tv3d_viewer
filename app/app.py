@@ -32,9 +32,11 @@ fdf['brand'] = fdf['tv'].apply(lambda x: brand_rename[x[:2].lower()])
 # above loads old dataframe for old data. need below: 
 
 tv3df = pd.read_csv(
-    'tv3d.csv', # hardcoded csv title/path
-    usecols= lambda x: x in [0] + range(2,61), # skips formatting columns 
-    )
+    'tv3d2.csv', # hardcoded csv title/path
+    skiprows=4, # skips to make column 
+    encoding='utf-8', # change for correct csv
+    header=0    
+)
 
 # currently non-functional 
 
