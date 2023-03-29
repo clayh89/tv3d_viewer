@@ -64,6 +64,7 @@ app.layout = html.Div([
 # we can build interface for that
 #
 
+#TODO update curves for new eqns
 curve1 = '0.2175*(x*y)**0.5661'
 curve2 = '(0.11841843059765*(x*y)**0.632781035697225)*0.95'
 curve3 = '(0.11841843059765*(x*y)**0.632781035697225)*0.95'
@@ -134,7 +135,7 @@ def update_output(value):
 
 
 
-
+# graph gen code
 
 @app.callback(
     Output('abc-on-plot', 'children'),
@@ -238,7 +239,10 @@ def abc_off_plot(eq1, eq2):
 
 
 
-
+#######################################
+# routing for different curves 
+# probably want like /standard /bright /hdr 
+# and nav buttons or bar from the main page. bootstrap would be a fun addition
 
 @app.callback(dash.dependencies.Output('page-content', 'children'),
               [dash.dependencies.Input('url', 'pathname')])
@@ -247,6 +251,10 @@ def display_page(pathname):
         return page_1_layout
     elif pathname == '/page-2':
         return page_2_layout
+    elif pathname == '/page-3':
+        return page_3_layout
+    #else
+        #return lost_layout
 
 
 if __name__ == '__main__':
