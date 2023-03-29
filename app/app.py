@@ -7,8 +7,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 
-### df = DataFrame (Pandas)
-# this setups up the data, the 4 luminance points
+### old dataframe setup  - currently needed for the graph but on its way out 
 df = pd.read_csv('plot.ly5.csv').T 
 df.columns = [3, 12, 35, 100]
 df = df.reset_index()
@@ -29,12 +28,15 @@ brand_rename = {'lg': 'LG', 'so': 'Sony', 'sa': 'Samsung', 'vi': 'Vizio'}
 fdf = fdf.reset_index()
 fdf['brand'] = fdf['tv'].apply(lambda x: brand_rename[x[:2].lower()])
 
-############ above loads old dataframe for old data. need below: 
+################################################
+# above loads old dataframe for old data. need below: 
 
 tv3df = pd.read_csv(
     'tv3d.csv', # hardcoded csv title/path
     usecols= lambda x: x in [0] + range(2,61), # skips formatting columns 
     )
+
+# currently non-functional 
 
 # lists for rows (indicies) that correspond to datasets 
 std_rows = []
@@ -135,7 +137,7 @@ def update_output(value):
 
 
 
-# graph gen code
+# graph gen code (old data)
 
 @app.callback(
     Output('abc-on-plot', 'children'),
@@ -182,6 +184,8 @@ def abc_on_plot(eq1, eq2):
     )
     fig.update_layout(height=900)
     return dcc.Graph(figure=fig)
+
+# graph gen code (old data) - this one draws less on the plot
 
 @app.callback(
     Output('abc-off-plot', 'children'),
@@ -243,6 +247,7 @@ def abc_off_plot(eq1, eq2):
 # routing for different curves 
 # probably want like /standard /bright /hdr 
 # and nav buttons or bar from the main page. bootstrap would be a fun addition
+# TODO: lost layout links back to the 3 pages
 
 @app.callback(dash.dependencies.Output('page-content', 'children'),
               [dash.dependencies.Input('url', 'pathname')])
