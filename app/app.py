@@ -29,6 +29,23 @@ brand_rename = {'lg': 'LG', 'so': 'Sony', 'sa': 'Samsung', 'vi': 'Vizio'}
 fdf = fdf.reset_index()
 fdf['brand'] = fdf['tv'].apply(lambda x: brand_rename[x[:2].lower()])
 
+############ above loads old dataframe for old data. need below: 
+
+tv3df = pd.read_csv(
+    'tv3d.csv', # hardcoded csv title/path
+    usecols= lambda x: x in [0] + range(2,61), # skips formatting columns 
+    )
+
+# lists for rows (indicies) that correspond to datasets 
+std_rows = []
+bri_rows = []
+hdr_rows = []
+
+# filters frame object per above list
+frame_std = tv3df.filter(items= std_rows)
+frame_hdr = tv3df.filter(items= bri_rows)
+frame_bright = tv3df.filter(items= hdr_rows)
+
 # this creates the frontend 
 
 app = dash.Dash()
@@ -41,60 +58,25 @@ app.layout = html.Div([
     html.Div(id='page-content')
 ])
 
-#commented out, but not sure why yet
-
-# app.layout = html.Div(children=[
-#
-#     html.B('Grey Surface Equation   '),
-#     dcc.Input(
-#         id='surface1-equation',
-#         type='text',
-#         value='0.2175*(x*y)**0.5661'
-#     ),
-#     html.Br(),
-#     html.Br(),
-#     html.B('Blue Surface Equation   '),
-#     dcc.Input(
-#         id='surface2-equation',
-#         type='text',
-#         value='.0526*x+12.911'
-#     ),
-#     html.Div(id='abc-on-plot'),
-#     html.Br(),
-#     html.Br(),
-#     html.Br(),
-#     html.Br(),
-#     html.B('Grey Surface Equation   '),
-#     dcc.Input(
-#         id='surface3-equation',
-#         type='text',
-#         value='(0.11841843059765*(x*y)**0.632781035697225)*0.95'
-#     ),
-#     html.Br(),
-#     html.Br(),
-#     html.B('Blue Surface Equation   '),
-#     dcc.Input(
-#         id='surface4-equation',
-#         type='text',
-#         value='(0.0831*x+13.635)*1.2'
-#     ),
-#     html.Div(id='abc-off-plot'),
-# ])
-
-
-
 ############################################
 # page_x_layout generates static plain equations 
 # right now, route swaps between the two
 # we can build interface for that
 #
 
+curve1 = '0.2175*(x*y)**0.5661'
+curve2 = '(0.11841843059765*(x*y)**0.632781035697225)*0.95'
+curve3 = '(0.11841843059765*(x*y)**0.632781035697225)*0.95'
+plane1 = '.0526*x+12.911'
+plane2 = '(0.0831*x+13.635)*1.2'
+plane3 = '(0.0831*x+13.635)*1.2'
+
 page_1_layout = html.Div(children=[
     html.B('Grey Surface Equation   '),
     dcc.Input(
        id='surface1-equation',
        type='text',
-       value='0.2175*(x*y)**0.5661'
+       value=curve1
     ),
     html.Br(),
     html.Br(),
@@ -102,7 +84,7 @@ page_1_layout = html.Div(children=[
     dcc.Input(
        id='surface2-equation',
        type='text',
-       value='.0526*x+12.911'
+       value=plane1
     ),
     html.Div(id='abc-on-plot')
 ])
@@ -112,7 +94,7 @@ page_2_layout = html.Div(children=[
     dcc.Input(
         id='surface3-equation',
         type='text',
-        value='(0.11841843059765*(x*y)**0.632781035697225)*0.95'
+        value=curve2
     ),
     html.Br(),
     html.Br(),
@@ -120,9 +102,27 @@ page_2_layout = html.Div(children=[
     dcc.Input(
         id='surface4-equation',
         type='text',
-        value='(0.0831*x+13.635)*1.2'
+        value=plane2
     ),
     html.Div(id='abc-off-plot'),
+])
+
+page_3_layout = html.Div(children=[
+    html.B('Grey Surface Equation   '),
+    dcc.Input(
+        id='surface3-equation',
+        type='text',
+        value=curve3
+    ),
+    html.Br(),
+    html.Br(),
+    html.B('Blue Surface Equation   '),
+    dcc.Input(
+        id='surface4-equation',
+        type='text',
+        value=plane3
+    ),
+    html.Div(id='abc-on-plot'),
 ])
 
 @app.callback(
@@ -131,6 +131,7 @@ page_2_layout = html.Div(children=[
 )
 def update_output(value):
     return
+
 
 
 
@@ -147,7 +148,7 @@ def abc_on_plot(eq1, eq2):
         color = color_dict[brand]
         marker = {'color': color, 'size': 8}
         text = tv_df['lux'].astype(str).to_list()
-        hovertemplate = 'lux: %{text}<br>' + 'sq inches: %{x:.0f}' + '<br>nits: %{y:.0f}' + '<br>watts:  %{z:.0f}'
+        hovertemplate = '%{text} lumens' + '<br>%{x:.0f} sq in' + '<br>%{y:.0f} nits' + '<br>%{z:.0f}W'
         scatter = go.Scatter3d(x=tv_df['area'], y=tv_df['luminance'], z=tv_df['power'],
                                name=tv, marker=marker, text=text, hovertemplate=hovertemplate,
                                legendgroup=brand, showlegend=False)
@@ -191,9 +192,10 @@ def abc_off_plot(eq1, eq2):
     df = df.iloc[:, :4]
 
     df.columns = ['tv', 'power', 'area', 'luminance']
+
+    # do we need brand? 
     brand_rename = {'lg': 'LG', 'so': 'Sony', 'sa': 'Samsung', 'vi': 'Vizio'}
     df['brand'] = df['tv'].apply(lambda x: brand_rename[x[:2].lower()])
-
     color_dict = {'Sony': 'green', 'LG':'blue', 'Samsung': 'red', 'Vizio': 'purple'}
 
     fig = go.Figure()
@@ -203,7 +205,7 @@ def abc_off_plot(eq1, eq2):
         color = color_dict[brand_df['brand'].iloc[0]]
         marker = {'color': color, 'size': 8}
         text = brand_df['tv'].to_list()
-        hovertemplate = '%{text}<br>' + 'sq. in.: %{x:.0f}' + '<br>nits: %{y:.0f}' + '<br>watts:  %{z:.0f}'
+        hovertemplate = '%{text} lumens' + '<br>%{x:.0f} sq in' + '<br>%{y:.0f} nits' + '<br>%{z:.0f}W'
         scatter = go.Scatter3d(x=brand_df['area'], y=brand_df['luminance'], z=brand_df['power'],
                                marker=marker, mode='markers', name=brand,
                                hovertemplate=hovertemplate, text=text)
